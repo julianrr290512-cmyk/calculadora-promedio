@@ -1,45 +1,55 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor Académico Inteligente & OCR</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Librería OCR Gratuita para lectura de imágenes -->
-    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Promedios & Alerta Temprana</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- 📦 LIBRERÍA OCR: Tesseract.js para lectura de imágenes directamente en el navegador -->
+  <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
 </head>
 <body>
-
+  <div class="container">
     <header class="app-header">
-        <h1><i class="fas fa-graduation-cap"></i> Gestor Académico Profesional</h1>
+      <h1>🎓 Gestor Académico e Inteligenia de Aula</h1>
+      <p>Calculadora de promedios y sistema de alerta temprana mid-term</p>
     </header>
 
-    <main class="container">
-        
-        <!-- Crear Asignatura -->
-        <section class="card add-section">
-            <input type="text" id="new-subject-name" placeholder="Nombre de la Asignatura (Ej: Matemáticas)">
-            <button id="add-subject-btn" class="btn-primary"><i class="fas fa-plus"></i> Nueva Materia</button>
-        </section>
+    <!-- 📸 SECCIÓN 1: CARGA DE PLANILLA EN IMAGEN -->
+    <section class="card upload-section">
+      <h2>📸 Módulo OCR: Cargar Planilla de Notas</h2>
+      <p>Sube una foto o captura de tu planilla (categorías, porcentajes y notas de estudiantes).</p>
+      
+      <div class="drop-zone">
+        <input type="file" id="imageInput" accept="image/*">
+        <p>📁 Haz clic aquí o arrastra una imagen de la planilla</p>
+      </div>
 
-        <!-- Escáner de Imágenes OCR -->
-        <section class="card ocr-section">
-            <h3><i class="fas fa-camera"></i> Escáner de Notas desde Imagen</h3>
-            <p>Sube una foto o captura con tus notas para extraerlas automáticamente:</p>
-            <div class="ocr-controls">
-                <input type="file" id="ocr-image-input" accept="image/*">
-                <button id="process-ocr-btn" class="btn-accent"><i class="fas fa-magic"></i> Leer Imagen</button>
-            </div>
-            <div id="ocr-status" class="ocr-status"></div>
-            <div id="ocr-results" class="ocr-results"></div>
-        </section>
+      <!-- Estado del procesamiento OCR -->
+      <div id="ocrStatus" class="status-box hidden">
+        <span class="spinner">⏳</span>
+        <span id="ocrStatusText">Procesando imagen con IA...</span>
+      </div>
+    </section>
 
-        <!-- Contenedor de Materias -->
-        <section id="subjects-container" class="subjects-grid"></section>
+    <!-- 🚨 SECCIÓN 2: TABLERO DE ALERTA TEMPRANA -->
+    <section id="alertsSection" class="card alerts-card hidden">
+      <h2>🚨 Estudiantes en Riesgo (Alerta Temprana <= 3.0)</h2>
+      <div id="alertsContainer" class="alerts-grid">
+        <!-- Aquí se generarán dinámicamente las tarjetas de alerta -->
+      </div>
+    </section>
 
-    </main>
+    <!-- 📊 SECCIÓN 3: TABLA GENERAL Y MANUAL -->
+    <section class="card">
+      <h2>📝 Registro de Estudiantes</h2>
+      <div id="studentsList">
+        <!-- Vista previa de datos parseados -->
+      </div>
+    </section>
+  </div>
 
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
