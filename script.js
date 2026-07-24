@@ -23,7 +23,7 @@ imageInput.addEventListener('change', async (event) => {
 async function procesarImagenPlanilla(file) {
   // Mostramos el estado de carga al usuario
   ocrStatus.classList.remove('hidden');
-  ocrStatusText.textContent = "Analizando texto e imagen de la planilla...";
+  ocrStatusText.textContent = "Analizando texto e imagen de la planilla con OCR...";
 
   try {
     // Ejecutamos Tesseract OCR en idioma español ('spa')
@@ -37,49 +37,58 @@ async function procesarImagenPlanilla(file) {
     });
 
     const textoExtraido = result.data.text;
-    console.log("Texto extraído de la imagen:\n", textoExtraido);
+    console.log("Texto crudo extraído de la imagen (OCR):\n", textoExtraido);
 
     // Ocultamos cargador
     ocrStatus.classList.add('hidden');
 
     // Parseamos el texto extraído y evaluamos las alertas
-    const datosEstructurados = parsearTextoPlanilla(textoExtraido);
+    const datosEstructurados = parsearTextoPlanillaAvanzado(textoExtraido);
+    console.log("Datos estructurados y limpios:\n", JSON.stringify(datosEstructurados, null, 2));
     evaluarAlertasTempranas(datosEstructurados);
 
   } catch (error) {
     console.error("Error al procesar la imagen:", error);
-    ocrStatusText.textContent = "❌ Error al leer la imagen. Intenta con una foto más clara.";
+    ocrStatusText.textContent = "❌ Error al leer la imagen. Intenta con una foto más clara y recta.";
   }
 }
 
 // ==========================================
-// 4. PARSEADOR DE TEXTO A ESTRUCTURA DE DATOS
+// 4. NUEVO PARSEADOR DE TEXTO AVANZADO Y LIMPIO
 // ==========================================
-// Convierte el texto plano en filas de estudiantes y notas
-function parsearTextoPlanilla(texto) {
+function parsearTextoPlanillaAvanzado(texto) {
   const lineas = texto.split('\n').filter(linea => linea.trim() !== '');
-  const estudiantes = [];
+  const estudiantesValidos = [];
 
-  // Expresión regular para identificar renglones con nombres y notas (ejemplo: Juan Perez 2.5 3.0)
+  // Expresión regular mejorada para identificar notas válidas entre 0.0 y 5.0
+  const regexNotas = /\b[0-5]([\.,][0-9])?\b/g;
+
   lineas.forEach(linea => {
-    // Busca números decimales (ej: 2.5, 3.0, 4,2)
-    const notasEncontradas = linea.match(/\b[0-5]([\.,][0-9])?\b/g);
+    const notasEncontradas = linea.match(regexNotas);
     
+    // VALIDACIÓN: Solo procesamos líneas que tengan AL MENOS UNA nota válida
     if (notasEncontradas && notasEncontradas.length > 0) {
-      // Extrae el nombre quitando los números de la línea
-      const nombre = linea.replace(/[0-9][\.,]?[0-9]?/g, '').trim();
       const notasNumericas = notasEncontradas.map(n => parseFloat(n.replace(',', '.')));
 
-      if (nombre.length > 2) {
-        estudiantes.push({
-          nombre: nombre,
+      // NUEVA LIMPIEZA DE NOMBRE:
+      // 1. Elimina números de la línea
+      let nombreLimpio = linea.replace(/[0-9][\.,]?[0-9]?/g, '');
+      // 2. Elimina caracteres basura comunes generados por el OCR ([, ], (, ), -, |, etc.)
+      nombreLimpio = nombreLimpio.replace(/[\[\]\(\)\-\|,_:\.;]/g, '');
+      // 3. Elimina espacios extra
+      nombreLimpio = nombreLimpio.replace(/\s+/g, ' ').trim();
+
+      // VALIDACIÓN: El nombre debe tener al menos 3 caracteres reales
+      if (nombreLimpio.length > 3) {
+        estudiantesValidos.push({
+          nombre: nombreLimpio,
           notas: notasNumericas
         });
       }
     }
   });
 
-  return estudiantes;
+  return estudiantesValidos;
 }
 
 // ==========================================
@@ -87,6 +96,14 @@ function parsearTextoPlanilla(texto) {
 // ==========================================
 function evaluarAlertasTempranas(estudiantes) {
   alertsContainer.innerHTML = ''; // Limpiar contenedor
+  alertsSection.classList.add('hidden'); // Ocultar por defecto
+  
+  if (estudiantes.length === 0) {
+    alertsSection.classList.remove('hidden');
+    alertsContainer.innerHTML = `<p>⚠️ No se encontraron estudiantes con notas válidas en la imagen. Intenta con una imagen más clara o recortada.</p>`;
+    return;
+  }
+
   let estudiantesEnRiesgo = 0;
 
   estudiantes.forEach(estudiante => {
@@ -113,10 +130,8 @@ function evaluarAlertasTempranas(estudiantes) {
   });
 
   // Mostrar u ocultar la sección de alertas según los resultados
-  if (estudiantesEnRiesgo > 0) {
-    alertsSection.classList.remove('hidden');
-  } else {
-    alertsSection.classList.remove('hidden');
-    alertsContainer.innerHTML = `<p>✅ ¡Excelente noticia! Ningún estudiante tiene un promedio parcial menor o igual a 3.0.</p>`;
+  alertsSection.classList.remove('hidden');
+  if (estudiantesEnRiesgo === 0) {
+    alertsContainer.innerHTML = `<p>✅ ¡Excelente noticia! Ningún estudiante con notas válidas tiene un promedio parcial menor o igual a 3.0.</p>`;
   }
 }
