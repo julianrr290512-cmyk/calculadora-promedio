@@ -1,4 +1,72 @@
-/* 📸 Zona de Carga de Imagen */
+/* ==========================================
+   1. VARIABLES GLOBALES Y ESTRUCTURA BASE
+   ========================================== */
+:root {
+  --bg-color: #eef2f5;
+  --primary-color: #1e293b;
+  --accent-color: #2563eb;
+  --card-bg: #ffffff;
+  --danger-color: #ef4444;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-color);
+  color: #334155;
+  line-height: 1.6;
+  padding-bottom: 40px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+/* ==========================================
+   2. ENCABEZADO Y TARJETAS (CARDS)
+   ========================================== */
+.app-header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 25px;
+  text-align: center;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: var(--shadow);
+}
+
+.app-header h1 {
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+}
+
+.card {
+  background-color: var(--card-bg);
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  margin-bottom: 25px;
+}
+
+.card h2 {
+  color: var(--primary-color);
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+}
+
+/* ==========================================
+   3. MÓDULO OCR Y ZONA DE CARGA DE IMAGEN
+   ========================================== */
 .drop-zone {
   border: 2px dashed var(--accent-color);
   padding: 25px;
@@ -13,7 +81,6 @@
   cursor: pointer;
 }
 
-/* ⏳ Estado de Procesamiento */
 .status-box {
   margin-top: 15px;
   padding: 12px;
@@ -27,7 +94,9 @@
   display: none !important;
 }
 
-/* 🚨 Tarjetas de Alerta Temprana */
+/* ==========================================
+   4. TABLERO DE ALERTA TEMPRANA
+   ========================================== */
 .alerts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -55,4 +124,5 @@
   border-radius: 12px;
   font-size: 0.8rem;
   font-weight: bold;
+  margin-bottom: 8px;
 }
